@@ -5,15 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Call Center - Open Tiket</title>
 
-  <!-- ✅ PERBAIKAN: Pengecekan Login agar halaman aman -->
+  <!-- 🚩 [TANDA PERBAIKAN 1]: Pengecekan Login diarahkan ke index.html -->
   <script>
     if (localStorage.getItem('isLoggedIn') !== 'true') {
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
     }
   </script>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
     
     :root {
       --bg-utama: #f8fafc;
@@ -310,7 +315,6 @@
   <!-- MAIN CONTENT -->
   <div class="main-content">
     
-    <!-- ✅ PERBAIKAN: Header Rapi & Presisi -->
     <header>
       <h3 id="judulHeader">Dashboard Monitoring Open Tiket</h3>
       <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
@@ -451,6 +455,7 @@
     </div>
   </div>
 
+  <!-- SCRIPT JAVASCRIPT UTAMA -->
   <script>
     let daftarTiket = JSON.parse(localStorage.getItem('dataTiketCallCenter')) || [];
 
@@ -702,11 +707,12 @@
       link.click();
     }
 
+    // 🚩 [TANDA PERBAIKAN 2]: Fungsi Logout diarahkan ke index.html
     function logoutAdmin() {
       if (confirm("Apakah Anda yakin ingin keluar dari dashboard?")) {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('adminUser');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
       }
     }
   </script>
