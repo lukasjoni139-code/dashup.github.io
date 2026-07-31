@@ -18,14 +18,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
 
     .login-card {
       background-color: #1e293b;
       padding: 2.5rem;
       border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
       width: 100%;
       max-width: 400px;
       border: 1px solid #334155;
@@ -67,11 +67,12 @@
       color: #fff;
       font-size: 0.95rem;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s ease;
     }
 
     .form-group input:focus {
       border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
     }
 
     .btn-login {
@@ -84,7 +85,7 @@
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s ease;
       margin-top: 0.5rem;
     }
 
@@ -133,14 +134,13 @@
       const pass = document.getElementById('password').value;
       const errorMsg = document.getElementById('errorMsg');
 
-      // Contoh Kredensial Login Sederhana (Username: admin, Password: 123)
+      // Kredensial Login (Username: admin, Password: 123)
       if (user === 'admin' && pass === '123') {
-        // Simpan status session login di localStorage
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('adminUser', user);
         
-        // Arahkan ke file dashboard kamu
-        window.location.href = 'dashboard_admin.html';
+        // Diarahkan ke file dashboard (sesuaikan dengan nama file di GitHub kamu)
+        window.location.href = 'dashboard.html'; 
       } else {
         errorMsg.style.display = 'block';
       }
