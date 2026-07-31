@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Call Center Portal</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-card {
+      background-color: #1e293b;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #334155;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header h2 {
+      font-size: 1.5rem;
+      color: #38bdf8;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      color: #cbd5e1;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: #38bdf8;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-login:hover {
+      background-color: #0369a1;
+    }
+
+    .error-msg {
+      color: #f87171;
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <div class="login-header">
+      <h2>🎧 Call Center Portal</h2>
+      <p>Silakan masuk ke akun Admin</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Username / Email</label>
+        <input type="text" id="username" placeholder="Masukkan username..." required autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Masukkan password..." required>
+      </div>
+
+      <button type="submit" class="btn-login">Masuk ke Dashboard</button>
+      <div id="errorMsg" class="error-msg">Username atau password salah!</div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      // Contoh Kredensial Login Sederhana (Username: admin, Password: 123)
+      if (user === 'admin' && pass === '123') {
+        // Simpan status session login di localStorage
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('adminUser', user);
+        
+        // Arahkan ke file dashboard kamu
+        window.location.href = 'dashboard_admin.html';
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    });
+  </script>
+
+</body>
+</html>

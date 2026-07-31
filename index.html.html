@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Call Center - Open Tiket</title>
+
+  <!-- ✅ PERBAIKAN: Pengecekan Login agar halaman aman -->
+  <script>
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    :root {
+      --bg-utama: #f8fafc;
+      --bg-card: #ffffff;
+      --teks-utama: #0f172a;
+      --teks-sekunder: #64748b;
+      --bg-sidebar: #0f172a;
+      --teks-sidebar: #94a3b8;
+      --border-color: #e2e8f0;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    body.dark-mode {
+      --bg-utama: #0f172a;
+      --bg-card: #1e293b;
+      --teks-utama: #f8fafc;
+      --teks-sekunder: #94a3b8;
+      --bg-sidebar: #0b1329;
+      --border-color: #334155;
+    }
+
+    /* MODAL ADMIN */
+    .modal-admin {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-admin-content {
+      background-color: var(--bg-card);
+      color: var(--teks-utama);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-detail {
+      background-color: #0284c7;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      margin-left: 5px;
+    }
+
+    body {
+      background-color: var(--bg-utama);
+      color: var(--teks-utama);
+      display: flex;
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .sidebar {
+      width: 280px;
+      background-color: var(--bg-sidebar);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .sidebar h2 {
+      color: #ffffff;
+      font-size: 1.1rem;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .menu-item {
+      color: var(--teks-sidebar);
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+
+    /* CARD STATUS AGEN & TEKNISI DI SIDEBAR */
+    .card-agen {
+      margin-top: 5px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .card-agen h4 {
+      font-size: 0.85rem;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .card-agen table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+
+    .card-agen th, .card-agen td {
+      padding: 6px 4px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--teks-sidebar);
+    }
+
+    .card-agen th {
+      color: #ffffff;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .btn-mode {
+      background-color: var(--bg-utama);
+      color: var(--teks-utama);
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .content-body { padding: 25px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* STATS CARDS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .card-stat {
+      background-color: var(--bg-card);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .card-stat h4 { color: var(--teks-sekunder); font-size: 0.8rem; margin-bottom: 5px; }
+    .card-stat .number { font-size: 1.6rem; font-weight: bold; }
+
+    /* FORM & TABLE SECTION */
+    .form-section, .table-section {
+      background-color: var(--bg-card);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--bg-utama);
+      color: var(--teks-utama);
+      font-size: 0.85rem;
+    }
+
+    .btn-submit {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 15px;
+    }
+
+    .btn-export {
+      background-color: var(--success);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    /* TABLE STYLING */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th { background-color: var(--bg-utama); color: var(--teks-sekunder); }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .badge-open { background-color: #fee2e2; color: #dc2626; }
+    .badge-progress { background-color: #fef3c7; color: #d97706; }
+    .badge-closed { background-color: #d1fae5; color: #059669; }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR PANELS -->
+  <div class="sidebar">
+    <h2>🎧 Call Center Portal</h2>
+    
+    <a id="menuTiket" class="menu-item active" onclick="bukaHalaman('tiket')">📌 Open Tiket Masuk</a>
+    <a id="menuSLA" class="menu-item" onclick="bukaHalaman('sla')">📈 Laporan SLA</a>
+
+    <!-- BOX 1: STATUS AGEN HELPDESK -->
+    <div class="card-agen">
+      <h4>🟢 Status Agen Helpdesk</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Peran</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tabelAgenBody">
+          <!-- Diisi via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BOX 2: TEKNISI ONLINE -->
+    <div class="card-agen">
+      <h4>🔧 Teknisi Online (Lapangan)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Teknisi</th>
+            <th>Area</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tabelTeknisiBody">
+          <!-- Diisi via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    
+    <!-- ✅ PERBAIKAN: Header Rapi & Presisi -->
+    <header>
+      <h3 id="judulHeader">Dashboard Monitoring Open Tiket</h3>
+      <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+        <button class="btn-mode" onclick="ubahMode()">🌙 / ☀️ Mode</button>
+        <button class="btn-export" onclick="exportKeExcel()">📥 Export Excel</button>
+        <button onclick="logoutAdmin()" style="background-color: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+          🚪 Logout
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      
+      <!-- HALAMAN 1: MONITORING TIKET -->
+      <div id="halamanTiket">
+        <!-- WIDGET RINGKASAN TIKET -->
+        <div class="stats-grid">
+          <div class="card-stat">
+            <h4>TOTAL TIKET HARI INI</h4>
+            <div class="number" id="statTotal" style="color: var(--primary);">0</div>
+          </div>
+          <div class="card-stat">
+            <h4>OPEN TIKET</h4>
+            <div class="number" id="statOpen" style="color: var(--danger);">0</div>
+          </div>
+          <div class="card-stat">
+            <h4>IN PROGRESS</h4>
+            <div class="number" id="statProgress" style="color: var(--warning);">0</div>
+          </div>
+          <div class="card-stat">
+            <h4>CLOSED</h4>
+            <div class="number" id="statClosed" style="color: var(--success);">0</div>
+          </div>
+        </div>
+
+        <!-- FORM INPUT TIKET BARU -->
+        <div class="form-section" style="margin-top: 20px;">
+          <h4>🎧 Input Tiket Panggilan Masuk</h4>
+          <div class="form-grid">
+            <input type="text" id="namaPelanggan" placeholder="Nama Pelanggan">
+            <input type="text" id="noTelepon" placeholder="Nomor Telepon / WA">
+            <select id="kategori">
+              <option value="Gangguan Jaringan">Gangguan Jaringan</option>
+              <option value="Tagihan / Billing">Tagihan / Billing</option>
+              <option value="Informasi Produk">Informasi Produk</option>
+              <option value="Kerusakan Perangkat">Kerusakan Perangkat</option>
+            </select>
+            <select id="prioritas">
+              <option value="Low">Prioritas: Low</option>
+              <option value="Medium">Prioritas: Medium</option>
+              <option value="High">Prioritas: High</option>
+            </select>
+            
+            <select id="namaAgen">
+              <option value="">-- Pilih Agen Ditugaskan --</option>
+              <option value="Bima (Helpdesk L1)">Bima (Helpdesk L1)</option>
+              <option value="Andi (Network Spec)">Andi (Network Spec)</option>
+              <option value="Siti (System Admin)">Siti (System Admin)</option>
+            </select>
+          </div>
+          <textarea id="catatan" rows="2" style="margin-top: 10px;" placeholder="Detail keluhan / masalah pelanggan..."></textarea>
+          <button class="btn-submit" onclick="tambahTiket()">+ Buat Tiket Masuk</button>
+        </div>
+
+        <!-- TABEL TIKET -->
+        <div class="table-section" style="margin-top: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4>📋 Daftar Open Tiket</h4>
+            <input type="text" id="cariTiket" placeholder="🔍 Cari Tiket / Pelanggan..." onkeyup="filterTiket()" style="width: 250px;">
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>ID Tiket</th>
+                <th>Pelanggan</th>
+                <th>No Telepon</th>
+                <th>Kategori</th>
+                <th>Agen</th>
+                <th>Prioritas</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tabelTiketBody">
+              <!-- Data dimasukkan via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- HALAMAN 2: LAPORAN SLA -->
+      <div id="halamanSLA" style="display: none;">
+        <div class="form-section">
+          <h4>📈 Ringkasan Laporan Service Level Agreement (SLA)</h4>
+          <p style="color: var(--teks-sekunder); margin-top: 8px; font-size: 0.9rem;">
+            Pemantauan performa penyelesaian tiket berdasarkan target waktu respon dan penanganan.
+          </p>
+
+          <div class="stats-grid" style="margin-top: 20px;">
+            <div class="card-stat">
+              <h4>PENCAPAIAN SLA</h4>
+              <div class="number" style="color: var(--success);">95.8%</div>
+            </div>
+            <div class="card-stat">
+              <h4>RATA-RATA RESPON</h4>
+              <div class="number" style="color: var(--primary);">12 Min</div>
+            </div>
+            <div class="card-stat">
+              <h4>RATA-RATA PENYELESAIAN</h4>
+              <div class="number" style="color: var(--warning);">2.4 Jam</div>
+            </div>
+            <div class="card-stat">
+              <h4>SLA BREACH (LATE)</h4>
+              <div class="number" style="color: var(--danger);">2 Tiket</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Detail & Bukti Foto Pekerjaan -->
+  <div id="modalDetailAdmin" class="modal-admin">
+    <div class="modal-admin-content">
+      <h3 style="margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+        🖼️ Bukti Pekerjaan Teknisi
+      </h3>
+      
+      <div id="isiDetailAdmin" style="font-size: 0.85rem; line-height: 1.5; margin-bottom: 15px;">
+        <!-- Isi detail dimasukkan lewat JS -->
+      </div>
+
+      <button onclick="tutupModalAdmin()" style="width: 100%; background: #ef4444; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer;">
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let daftarTiket = JSON.parse(localStorage.getItem('dataTiketCallCenter')) || [];
+
+    // Sinkronisasi Real-Time saat data berubah di localStorage
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'dataTiketCallCenter') {
+        daftarTiket = JSON.parse(e.newValue) || [];
+        tampilkanTiket(); 
+      }
+    });
+
+    const dataAgen = [
+      { nama: "Bima", peran: "Helpdesk L1", status: "Available" },
+      { nama: "Andi", peran: "Network Spec", status: "Busy" },
+      { nama: "Siti", peran: "SysAdmin", status: "Offline" }
+    ];
+
+    const dataTeknisi = [
+      { nama: "Rian", area: "Depok", status: "Online" },
+      { nama: "Deni", area: "Jakarta", status: "In Field" },
+      { nama: "Eko", area: "Bogor", status: "Offline" }
+    ];
+
+    window.onload = function() {
+      if (localStorage.getItem("modeGelapCallCenter") === "true") {
+        document.body.classList.add("dark-mode");
+      }
+      tampilkanTiket();
+      tampilkanDaftarAgen();
+      tampilkanDaftarTeknisi();
+    };
+
+    function bukaHalaman(halaman) {
+      const pnlTiket = document.getElementById("halamanTiket");
+      const pnlSLA = document.getElementById("halamanSLA");
+      const btnTiket = document.getElementById("menuTiket");
+      const btnSLA = document.getElementById("menuSLA");
+      const judul = document.getElementById("judulHeader");
+
+      if (halaman === 'tiket') {
+        pnlTiket.style.display = "block";
+        pnlSLA.style.display = "none";
+        btnTiket.classList.add("active");
+        btnSLA.classList.remove("active");
+        judul.innerText = "Dashboard Monitoring Open Tiket";
+      } else if (halaman === 'sla') {
+        pnlTiket.style.display = "none";
+        pnlSLA.style.display = "block";
+        btnSLA.classList.add("active");
+        btnTiket.classList.remove("active");
+        judul.innerText = "Laporan Performa & SLA Call Center";
+      }
+    }
+
+    function ubahMode() {
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      localStorage.setItem("modeGelapCallCenter", isDark);
+    }
+
+    function tampilkanDaftarAgen() {
+      const tbody = document.getElementById("tabelAgenBody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      dataAgen.forEach(agen => {
+        let warna = agen.status === "Available" ? "#10b981" : (agen.status === "Busy" ? "#f59e0b" : "#64748b");
+        
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${agen.nama}</strong></td>
+            <td>${agen.peran}</td>
+            <td style="color: ${warna}; font-weight: bold;">● ${agen.status}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function tampilkanDaftarTeknisi() {
+      const tbody = document.getElementById("tabelTeknisiBody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      dataTeknisi.forEach(tek => {
+        let warna = tek.status === "Online" ? "#10b981" : (tek.status === "In Field" ? "#3b82f6" : "#64748b");
+        
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${tek.nama}</strong></td>
+            <td>${tek.area}</td>
+            <td style="color: ${warna}; font-weight: bold;">● ${tek.status}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function tambahTiket() {
+      const pelanggan = document.getElementById("namaPelanggan").value;
+      const telepon = document.getElementById("noTelepon").value;
+      const kategori = document.getElementById("kategori").value;
+      const prioritas = document.getElementById("prioritas").value;
+      const agen = document.getElementById("namaAgen").value;
+      const catatan = document.getElementById("catatan").value;
+
+      if (!pelanggan || !telepon || !agen) {
+        alert("Harap isi Nama Pelanggan, No Telepon, dan Pilih Agen!");
+        return;
+      }
+
+      const idTiket = "TKT-" + Math.floor(1000 + Math.random() * 9000);
+      const tiketBaru = {
+        id: idTiket,
+        pelanggan: pelanggan,
+        telepon: telepon,
+        kategori: kategori,
+        prioritas: prioritas,
+        agen: agen,
+        catatan: catatan,
+        status: "Open"
+      };
+
+      daftarTiket.unshift(tiketBaru);
+      simpanData();
+      tampilkanTiket();
+
+      // Reset Form
+      document.getElementById("namaPelanggan").value = "";
+      document.getElementById("noTelepon").value = "";
+      document.getElementById("namaAgen").value = "";
+      document.getElementById("catatan").value = "";
+    }
+
+    function ubahStatus(index, statusBaru) {
+      daftarTiket[index].status = statusBaru;
+      simpanData();
+      tampilkanTiket();
+    }
+
+    function simpanData() {
+      localStorage.setItem('dataTiketCallCenter', JSON.stringify(daftarTiket));
+    }
+
+    function tampilkanTiket() {
+      const tbody = document.getElementById("tabelTiketBody");
+      tbody.innerHTML = "";
+
+      let countOpen = 0, countProgress = 0, countClosed = 0;
+
+      daftarTiket.forEach((tiket, index) => {
+        if (tiket.status === "Open") countOpen++;
+        if (tiket.status === "In Progress") countProgress++;
+        if (tiket.status === "Closed") countClosed++;
+
+        let badgeClass = tiket.status === "Open" ? "badge-open" : (tiket.status === "In Progress" ? "badge-progress" : "badge-closed");
+
+        const row = `
+          <tr>
+            <td><b>${tiket.id}</b></td>
+            <td>${tiket.pelanggan}</td>
+            <td>${tiket.telepon}</td>
+            <td>${tiket.kategori}</td>
+            <td>${tiket.agen}</td>
+            <td>${tiket.prioritas}</td>
+            <td><span class="badge ${badgeClass}">${tiket.status}</span></td>
+            <td style="display: flex; gap: 4px; align-items: center;">
+              <select onchange="ubahStatus(${index}, this.value)" style="padding: 3px 6px; font-size: 0.75rem;">
+                <option value="Open" ${tiket.status === "Open" ? "selected" : ""}>Open</option>
+                <option value="In Progress" ${tiket.status === "In Progress" ? "selected" : ""}>In Progress</option>
+                <option value="Closed" ${tiket.status === "Closed" ? "selected" : ""}>Closed</option>
+              </select>
+              <button class="btn-detail" onclick="lihatBuktiFoto(${index})" title="Lihat Bukti Foto">👁️ Detail</button>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+
+      document.getElementById("statTotal").innerText = daftarTiket.length;
+      document.getElementById("statOpen").innerText = countOpen;
+      document.getElementById("statProgress").innerText = countProgress;
+      document.getElementById("statClosed").innerText = countClosed;
+    }
+
+    function lihatBuktiFoto(index) {
+      const tiket = daftarTiket[index];
+      const container = document.getElementById("isiDetailAdmin");
+
+      let fotoSebelumHTML = tiket.fotoSebelum 
+        ? `<img src="${tiket.fotoSebelum}" style="width: 100%; max-height: 150px; object-fit: cover; border-radius: 6px; margin-top: 4px;">` 
+        : `<p style="color: var(--teks-sekunder); font-style: italic; font-size: 0.8rem;">Belum ada foto</p>`;
+
+      let fotoSesudahHTML = tiket.fotoSesudah 
+        ? `<img src="${tiket.fotoSesudah}" style="width: 100%; max-height: 150px; object-fit: cover; border-radius: 6px; margin-top: 4px;">` 
+        : `<p style="color: var(--teks-sekunder); font-style: italic; font-size: 0.8rem;">Belum ada foto</p>`;
+
+      container.innerHTML = `
+        <p><b>ID Tiket:</b> ${tiket.id}</p>
+        <p><b>Pelanggan:</b> ${tiket.pelanggan} (${tiket.telepon})</p>
+        <p style="margin-top: 8px;"><b>Catatan Keluhan:</b> ${tiket.catatan || '-'}</p>
+        <p style="margin-top: 8px;"><b>Catatan / Solusi Teknisi:</b></p>
+        <div style="background: var(--bg-utama); padding: 8px; border-radius: 6px; margin: 4px 0 10px 0; border: 1px solid var(--border-color);">
+          ${tiket.solusi || '<i>Belum ada catatan solusi dari teknisi.</i>'}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+          <div>
+            <span style="color: #f87171; font-weight: bold; font-size: 0.75rem;">📷 Foto Sebelum:</span>
+            ${fotoSebelumHTML}
+          </div>
+          <div>
+            <span style="color: #34d399; font-weight: bold; font-size: 0.75rem;">📸 Foto Sesudah:</span>
+            ${fotoSesudahHTML}
+          </div>
+        </div>
+      `;
+
+      document.getElementById("modalDetailAdmin").style.display = "flex";
+    }
+
+    function tutupModalAdmin() {
+      document.getElementById("modalDetailAdmin").style.display = "none";
+    }
+
+    function filterTiket() {
+      const keyword = document.getElementById("cariTiket").value.toLowerCase();
+      const rows = document.querySelectorAll("#tabelTiketBody tr");
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(keyword) ? "" : "none";
+      });
+    }
+
+    function exportKeExcel() {
+      if (daftarTiket.length === 0) {
+        alert("Belum ada data tiket untuk di-export!");
+        return;
+      }
+
+      let csv = "\uFEFFID Tiket,Pelanggan,No Telepon,Kategori,Agen,Prioritas,Status,Catatan\n";
+      daftarTiket.forEach(t => {
+        csv += `"${t.id}","${t.pelanggan}","${t.telepon}","${t.kategori}","${t.agen}","${t.prioritas}","${t.status}","${t.catatan}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Rekap_Tiket_CallCenter.csv";
+      link.click();
+    }
+
+    function logoutAdmin() {
+      if (confirm("Apakah Anda yakin ingin keluar dari dashboard?")) {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('adminUser');
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
+</body>
+</html>
